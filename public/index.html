@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Resume Lab</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+    <header class="topbar">
+        <h1>Resume Lab</h1>
+    </header>
+
+    <main>
+        <section class="panel">
+            <h2>New tailored resume</h2>
+            <textarea id="jd-input" placeholder="Paste the job description here…" rows="8"></textarea>
+            <button id="generate-btn">Generate resume</button>
+            <p id="generate-status" class="status"></p>
+        </section>
+
+        <section class="panel">
+            <h2>Knowledge</h2>
+            <p class="hint">Jot down something you did at work — a sentence or two is enough. Claude tags it so future tailored resumes can pull from it.</p>
+            <textarea id="knowledge-input" placeholder="e.g. Set up a Grafana dashboard to track model drift in production…" rows="3"></textarea>
+            <button id="knowledge-add-btn">Add to knowledge</button>
+            <p id="knowledge-status" class="status"></p>
+            <ul id="knowledge-list" class="knowledge-list"></ul>
+        </section>
+
+        <section class="panel">
+            <h2>Drafts</h2>
+            <ul id="draft-list" class="draft-list"></ul>
+        </section>
+
+        <section class="panel" id="detail-panel" hidden>
+            <h2 id="detail-title">—</h2>
+            <p id="detail-meta" class="status"></p>
+
+            <div class="view-toggle">
+                <button id="view-preview-btn" class="toggle active">Preview</button>
+                <button id="view-edit-btn" class="toggle">Edit markdown</button>
+            </div>
+
+            <div class="pdf-wrap" id="pdf-wrap">
+                <iframe id="pdf-frame" title="Resume preview"></iframe>
+            </div>
+
+            <div id="edit-wrap" hidden>
+                <textarea id="markdown-edit" rows="20"></textarea>
+                <div class="actions">
+                    <button id="save-markdown-btn">Save changes</button>
+                    <button id="cancel-edit-btn" class="secondary">Cancel</button>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button id="download-btn">Download PDF</button>
+                <button id="promote-btn" class="secondary">Promote to base resume</button>
+            </div>
+
+            <h3>Correction (Claude)</h3>
+            <textarea id="correction-input" placeholder="e.g. Shorten the summary to two sentences" rows="3"></textarea>
+            <button id="correct-btn">Apply correction</button>
+            <p id="correct-status" class="status"></p>
+        </section>
+    </main>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>
