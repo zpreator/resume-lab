@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import crypto from 'crypto';
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -9,7 +10,30 @@ import { listKnowledge, createKnowledge, deleteKnowledge } from './lib/knowledge
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 const PORT = process.env.PORT || 3000;
+const AUTH_USERNAME = process.env.USERNAME || 'admin';
+const AUTH_PASSWORD = process.env.PASSWORD || 'admin';
 
+function timingSafeEqual(a, b) {
+    const bufA = Buffer.from(a);
+    const bufB = Buffer.from(b);
+    if (bufA.length !== bufB.length) return false;
+    return crypto.timingSafeEqual(bufA, bufB);
+}
+
+function basicAuth(req, res, next) {
+    const header = req.headers.authorization || '';
+    const [scheme, encoded] = header.split(' ');
+    if (scheme === 'Basic' && encoded) {
+        const [user, pass] = Buffer.from(encoded, 'base64').toString('utf8').split(':');
+        if (timingSafeEqual(user || '', AUTH_USERNAME) && timingSafeEqual(pass || '', AUTH_PASSWORD)) {
+            return next();
+        }
+    }
+    res.set('WWW-Authenticate', 'Basic realm="Resume Lab"');
+    res.status(401).send('Authentication required');
+}
+
+app.use(basicAuth);
 app.use(express.json({ limit: '2mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
