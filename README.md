@@ -1,8 +1,11 @@
 # Resume Lab
 
-Local tool: paste a job description, get a Claude-tailored resume, submit corrections in plain English, preview and download the PDF, and promote a draft to `base-resume.md`.
+Local tool with two tabs:
 
-MVP — runs on your machine only, no auth. Storage is flat files in `resumes/`.
+- **Resume** — paste a job description, get a Claude-tailored resume, submit corrections in plain English, preview and download the PDF, and promote a draft to `base-resume.md`.
+- **Job Tracker** — a table of every application you have out, with a status timeline per application. Meant to be kept up to date by an external automated routine (e.g. a scheduled Claude process reading your inbox) via the API documented in [`docs/job-tracker-api.md`](docs/job-tracker-api.md), plus manual add/edit for anything that doesn't come in cleanly by email.
+
+MVP — runs on your machine, protected by a single shared login. Storage is flat JSON files in `data/`.
 
 ## Setup
 
@@ -38,7 +41,9 @@ docker compose up --build
 - `POST /api/resumes/:id/promote` overwrites `data/base-resume.md` with a draft.
 - `POST /api/knowledge` takes a raw freeform note about something you did at work, has Claude tag it (summary, skills, company, timeframe), and stores it in `data/knowledge/`. `generateResume` includes all knowledge entries alongside the base resume so tailored drafts can pull from accomplishments not yet folded into the master resume.
 - The PDF preview/download reuses the exact parser (`public/resume-parser.js`) and renderer (`public/pdf.js`) logic from the portfolio site, copied here so this tool stays self-contained if it's later split into its own repo.
+- `data/jobs/<id>.json` holds one job application each, including its full status-change timeline (`lib/jobsStore.js`). The `/api/jobs*` endpoints (documented in [`docs/job-tracker-api.md`](docs/job-tracker-api.md)) back both the Job Tracker tab and an external automated routine — the routine authenticates with a bearer token (`JOB_TRACKER_API_KEY`) instead of the browser's Basic Auth login.
+- The Job Tracker table highlights rows amber if they've had no `lastUpdated` movement in 14+ days (and aren't already in a terminal status), and highlights `interview_scheduled` rows in accent color.
 
 ## Out of scope (MVP)
 
-No auth, no cover letters, whole-file promote only (no section-level merge).
+No cover letters, whole-file resume promote only (no section-level merge), no kanban view for the job tracker (table only for now).

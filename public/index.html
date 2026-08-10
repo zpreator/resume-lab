@@ -10,9 +10,13 @@
 <body>
     <header class="topbar">
         <h1>Resume Lab</h1>
+        <nav class="tabbar">
+            <button id="tab-btn-resume" class="tab-btn active">Resume</button>
+            <button id="tab-btn-jobs" class="tab-btn">Job Tracker</button>
+        </nav>
     </header>
 
-    <main>
+    <main id="tab-resume">
         <section class="panel">
             <h2>New tailored resume</h2>
             <textarea id="jd-input" placeholder="Paste the job description here…" rows="8"></textarea>
@@ -67,6 +71,99 @@
         </section>
     </main>
 
+    <main id="tab-jobs" hidden>
+        <section class="panel">
+            <div class="jobs-toolbar">
+                <h2 class="jobs-toolbar-title">Applications</h2>
+                <div class="jobs-filters">
+                    <select id="jobs-filter-status">
+                        <option value="">All statuses</option>
+                    </select>
+                    <select id="jobs-filter-source">
+                        <option value="">All sources</option>
+                    </select>
+                    <button id="jobs-add-btn">Add application</button>
+                </div>
+            </div>
+            <p class="hint">Sorted by most recently updated. Rows highlighted amber need a follow-up.</p>
+            <div class="jobs-table-wrap">
+                <table class="jobs-table">
+                    <thead>
+                        <tr>
+                            <th>Company</th>
+                            <th>Role</th>
+                            <th>Source</th>
+                            <th>Status</th>
+                            <th>Applied</th>
+                            <th>Last updated</th>
+                        </tr>
+                    </thead>
+                    <tbody id="jobs-table-body"></tbody>
+                </table>
+            </div>
+            <p id="jobs-empty" class="status" hidden>No applications yet — add one above, or point the inbox routine at the API.</p>
+        </section>
+
+        <section class="panel" id="job-detail-panel" hidden>
+            <div class="jobs-toolbar">
+                <h2 id="job-detail-title">—</h2>
+                <div class="jobs-filters">
+                    <button id="job-edit-btn" class="secondary">Edit</button>
+                    <button id="job-delete-btn" class="secondary">Delete</button>
+                    <button id="job-close-btn" class="secondary">Close</button>
+                </div>
+            </div>
+            <p id="job-detail-meta" class="status"></p>
+
+            <div class="job-detail-grid">
+                <div>
+                    <div><strong>Source:</strong> <span id="job-detail-source"></span></div>
+                    <div><strong>Applied:</strong> <span id="job-detail-applied"></span></div>
+                    <div><strong>Contact:</strong> <span id="job-detail-contact"></span></div>
+                    <div><strong>Job posting:</strong> <span id="job-detail-url"></span></div>
+                    <div><strong>Email thread:</strong> <span id="job-detail-thread"></span></div>
+                </div>
+                <div>
+                    <strong>Notes</strong>
+                    <p id="job-detail-notes" class="job-notes"></p>
+                </div>
+            </div>
+
+            <h3>Status timeline</h3>
+            <ul id="job-timeline" class="job-timeline"></ul>
+
+            <div class="job-status-add">
+                <select id="job-status-add-select"></select>
+                <input id="job-status-add-note" type="text" placeholder="Optional note (e.g. reason for rejection)" />
+                <button id="job-status-add-btn">Log status change</button>
+            </div>
+        </section>
+
+        <section class="panel" id="job-form-panel" hidden>
+            <h2 id="job-form-title">Add application</h2>
+            <form id="job-form">
+                <div class="job-form-grid">
+                    <label>Company<input id="job-form-company" type="text" required /></label>
+                    <label>Role title<input id="job-form-role" type="text" required /></label>
+                    <label>Source<select id="job-form-source"></select></label>
+                    <label>Status<select id="job-form-status"></select></label>
+                    <label>Applied date<input id="job-form-applied-date" type="date" /></label>
+                    <label>Job posting URL<input id="job-form-url" type="url" /></label>
+                    <label>Contact name<input id="job-form-contact-name" type="text" /></label>
+                    <label>Contact info<input id="job-form-contact-info" type="text" /></label>
+                    <label class="span-2">Email thread ref<input id="job-form-thread" type="text" placeholder="Gmail thread ID, for de-duping automated updates" /></label>
+                    <label class="span-2">Notes<textarea id="job-form-notes" rows="3"></textarea></label>
+                </div>
+                <div class="actions">
+                    <button type="submit" id="job-form-save-btn">Save</button>
+                    <button type="button" id="job-form-cancel-btn" class="secondary">Cancel</button>
+                </div>
+                <p id="job-form-status-msg" class="status"></p>
+            </form>
+        </section>
+    </main>
+
     <script type="module" src="app.js"></script>
+    <script type="module" src="jobs.js"></script>
 </body>
 </html>
