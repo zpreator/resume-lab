@@ -7,17 +7,10 @@ the app's conventions (see `lib/jobsStore.js`).
 
 ## Auth
 
-Every route below sits behind the app's single auth middleware, which accepts **either**:
-
-- HTTP Basic Auth (`USERNAME`/`PASSWORD` env vars) — used by the browser UI, or
-- A bearer token — used by automated callers:
-
-```
-Authorization: Bearer <JOB_TRACKER_API_KEY>
-```
-
-Set `JOB_TRACKER_API_KEY` in `.env` (see `.env.example`; generate one with `openssl rand -hex 32`).
-If the env var is unset, bearer-token auth is disabled and only Basic Auth works.
+The app no longer authenticates requests itself: access is controlled in front of it
+(Cloudflare Access), so these routes have no in-app login. The former `JOB_TRACKER_API_KEY`
+bearer token is currently unused (see the follow-up note in `server.js`). Do not expose the
+app's port outside a trusted network without an access layer in front of it.
 
 All request/response bodies are JSON. Base URL is wherever the app is reachable (e.g.
 `http://<host>:3000`).

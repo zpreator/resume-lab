@@ -1,5 +1,4 @@
 import 'dotenv/config';
-import crypto from 'crypto';
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -21,39 +20,9 @@ import {
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 const PORT = process.env.PORT || 3000;
-const AUTH_USERNAME = process.env.USERNAME || 'admin';
-const AUTH_PASSWORD = process.env.PASSWORD || 'admin';
-const JOB_TRACKER_API_KEY = process.env.JOB_TRACKER_API_KEY || '';
+// Access control is handled in front of the app (Cloudflare Access), not in-process.
+// TODO(job-tracker): the automated /api/jobs* caller previously used a Bearer key; revisit.
 
-function timingSafeEqual(a, b) {
-    const bufA = Buffer.from(a);
-    const bufB = Buffer.from(b);
-    if (bufA.length !== bufB.length) return false;
-    return crypto.timingSafeEqual(bufA, bufB);
-}
-
-// Two ways in: a browser session (HTTP Basic Auth) or an automated routine
-// bearing the job-tracker API key (Authorization: Bearer <key>).
-function basicAuth(req, res, next) {
-    const header = req.headers.authorization || '';
-    const [scheme, credential] = header.split(' ');
-
-    if (scheme === 'Bearer' && JOB_TRACKER_API_KEY && credential) {
-        if (timingSafeEqual(credential, JOB_TRACKER_API_KEY)) return next();
-    }
-
-    if (scheme === 'Basic' && credential) {
-        const [user, pass] = Buffer.from(credential, 'base64').toString('utf8').split(':');
-        if (timingSafeEqual(user || '', AUTH_USERNAME) && timingSafeEqual(pass || '', AUTH_PASSWORD)) {
-            return next();
-        }
-    }
-
-    res.set('WWW-Authenticate', 'Basic realm="Resume Lab"');
-    res.status(401).json({ error: 'Authentication required' });
-}
-
-app.use(basicAuth);
 app.use(express.json({ limit: '2mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
