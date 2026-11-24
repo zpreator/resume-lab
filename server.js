@@ -20,8 +20,8 @@ import {
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 const PORT = process.env.PORT || 3000;
-// Access control is handled in front of the app (Cloudflare Access), not in-process.
-// TODO(job-tracker): the automated /api/jobs* caller previously used a Bearer key; revisit.
+// Access control is handled in front of the app (Cloudflare Access), not in-process. The automated
+// job-tracker routine gets in with an Access Service Token (see docs/job-tracker-api.md).
 
 app.use(express.json({ limit: '2mb' }));
 app.use(express.static(path.join(__dirname, 'public')));

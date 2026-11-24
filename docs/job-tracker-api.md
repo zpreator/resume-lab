@@ -7,10 +7,28 @@ the app's conventions (see `lib/jobsStore.js`).
 
 ## Auth
 
-The app no longer authenticates requests itself: access is controlled in front of it
-(Cloudflare Access), so these routes have no in-app login. The former `JOB_TRACKER_API_KEY`
-bearer token is currently unused (see the follow-up note in `server.js`). Do not expose the
-app's port outside a trusted network without an access layer in front of it.
+The app does not authenticate requests itself: access is controlled in front of it by
+**Cloudflare Access**, so these routes have no in-app login. Do not expose the app's port outside
+a trusted network without an access layer in front of it.
+
+- **Browser:** sign in through the Access login page.
+- **Automated routine (e.g. the scheduled Claude process):** use an Access **Service Token**.
+  Send its two values as headers on every request:
+
+  ```
+  CF-Access-Client-Id: <client id>
+  CF-Access-Client-Secret: <client secret>
+  ```
+
+  Cloudflare checks them before the request reaches the app; a request without valid headers is
+  redirected to the login page and never arrives. Create the token under Zero Trust > Access >
+  Service Auth, then add a policy with action **Service Auth** that includes it on this
+  application. Keep the secret in the routine's secret store (not a plain environment variable),
+  give the token an expiry, and rotate it before then.
+
+The routine only needs `/api/jobs`, `/api/jobs/upsert` and `/api/jobs/:id/status`. The rest of the
+API (resume generation, which spends Anthropic credit, the knowledge base, and the resumes) is
+behind the same gate, so treat the token as access to all of it.
 
 All request/response bodies are JSON. Base URL is wherever the app is reachable (e.g.
 `http://<host>:3000`).
@@ -145,8 +163,9 @@ this). **Response:** `200` — `{ "deleted": true }`.
 
 ```bash
 # 1. Upsert what was found in an email (creates or updates + logs status change)
-curl -X POST http://localhost:3000/api/jobs/upsert \
-  -H "Authorization: Bearer $JOB_TRACKER_API_KEY" \
+curl -X POST https://resumelab.puzzleshome.com/api/jobs/upsert \
+  -H "CF-Access-Client-Id: $CF_ACCESS_CLIENT_ID" \
+  -H "CF-Access-Client-Secret: $CF_ACCESS_CLIENT_SECRET" \
   -H "Content-Type: application/json" \
   -d '{
     "company": "GE HealthCare",
@@ -158,6 +177,7 @@ curl -X POST http://localhost:3000/api/jobs/upsert \
   }'
 
 # 2. Optional: check current state before deciding something is a dup
-curl http://localhost:3000/api/jobs?status=interviewing \
-  -H "Authorization: Bearer $JOB_TRACKER_API_KEY"
+curl "https://resumelab.puzzleshome.com/api/jobs?status=interviewing" \
+  -H "CF-Access-Client-Id: $CF_ACCESS_CLIENT_ID" \
+  -H "CF-Access-Client-Secret: $CF_ACCESS_CLIENT_SECRET"
 ```

@@ -41,7 +41,7 @@ docker compose up --build
 - `POST /api/resumes/:id/promote` overwrites `data/base-resume.md` with a draft.
 - `POST /api/knowledge` takes a raw freeform note about something you did at work, has Claude tag it (summary, skills, company, timeframe), and stores it in `data/knowledge/`. `generateResume` includes all knowledge entries alongside the base resume so tailored drafts can pull from accomplishments not yet folded into the master resume.
 - The PDF preview/download reuses the exact parser (`public/resume-parser.js`) and renderer (`public/pdf.js`) logic from the portfolio site, copied here so this tool stays self-contained if it's later split into its own repo.
-- `data/jobs/<id>.json` holds one job application each, including its full status-change timeline (`lib/jobsStore.js`). The `/api/jobs*` endpoints (documented in [`docs/job-tracker-api.md`](docs/job-tracker-api.md)) back both the Job Tracker tab and an external automated routine — the routine authenticates with a bearer token (`JOB_TRACKER_API_KEY`) instead of the browser's Basic Auth login.
+- `data/jobs/<id>.json` holds one job application each, including its full status-change timeline (`lib/jobsStore.js`). The `/api/jobs*` endpoints (documented in [`docs/job-tracker-api.md`](docs/job-tracker-api.md)) back both the Job Tracker tab and an external automated routine — the routine gets through Cloudflare Access with a Service Token (two `CF-Access-Client-*` headers) instead of the browser login.
 - The Job Tracker table highlights rows amber if they've had no `lastUpdated` movement in 14+ days (and aren't already in a terminal status), and highlights `interview_scheduled` rows in accent color.
 
 ## Out of scope (MVP)
